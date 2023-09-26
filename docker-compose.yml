@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  app:
+    image: brewing-service
+    container_name: brewing-service
+    restart: unless-stopped
+    ports:
+      - 6636:6636
+    depends_on:
+      - database
+    environment:
+      OPENAI_TOKEN: sk-5Cpzm6j3lB8LxVqKG1UWs5FkN8HrSCF6x3WJq1ECsGmklx
+      OPENAI_BASE_URL: https://ai.openai.net/v1
+      BARK_NOTIFY_DOMAIN: https://notify.bark.com
+      BARK_NOTIFY_TOKEN: vZgkHTPK3FLe5u4
+      WHISPER_ENDPOINT: http://i.whisper.com
+      OPENAI_PROXY: http://proxy
+      DOCKER_HOST: tcp://172.16.0.88:2375
+      SHARE_DOMAIN: https://share.com
+      MONGODB_CONN: mongodb://database:27017
+    volumes:
+      - /data/brewing/templates:/app/templates
+    links:
+      - database
+
+  database:
+    image: mongo
+    container_name: brewing-database
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb:/data/db
+      - mongodbcfg:/data/configdb
+
+  mongoku:
+    image: huggingface/mongoku
+    container_name: brewing-mongoku
+    environment:
+      MONGOKU_DEFAULT_HOST: "mongodb://database:27017"
+    ports:
+      - '3100:3100'
+    links:
+      - database
+
+volumes:
+  mongodb: {}
+  mongodbcfg: {}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover">
+    <meta name="wechat-enable-text-zoom-em" content="true">
+    <title>{{.Name}}</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/weui/2.5.16/style/weui.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js"></script>
+</head>
+<style>
+    @media (prefers-color-scheme: dark) {
+        body {
+            background: #111;
+            color: #fff;
+        }
+    }
+
+    .monospace {
+        font-family: "Lucida Console", Courier, monospace;
+    }
+</style>
+{{if .Raw}}
+<style>
+    .indent {
+        margin-left: 2em;
+    }
+</style>
+{{end}}
+
+<body ontouchstart>
+<div class="container" id="container" style="max-width: 677px; margin: auto;padding: 0 20px;">
+    <div class="page__hd" style="margin-top: 20px;">
+        <h1 class="page__title" style="font-size: 22px; padding-top: 15px; line-height: 1.4; margin-bottom: 20px;">
+            {{.Name}}
+        </h1>
+        <p class="weui-footer__links">
+            <a target="_blank" href="{{.Url}}"
+               class="weui-footer__link weui-wa-hotarea" style="color:#576b95; margin: 0 8px 0 0;">Video</a>
+            {{if not .Raw}}
+            <a href="?raw=true"
+               class="weui-footer__link weui-wa-hotarea" style="color:#576b95; margin: 0 8px 0 0;">Subtitle</a>
+            {{end}}
+        </p>
+    </div>
+    <div class="page__bd page__bd_spacing"
+         style="width: 100%; {{if not .Raw}}text-indent:2em;{{end}} margin-top: 30px;">
+        {{range .Content}}
+        <p class="monospace">{{. | safeHTML}}</p>
+        {{end}}
+    </div>
+</div>
+</body>
+
+</html>
