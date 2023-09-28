@@ -3,7 +3,6 @@ version: '3'
 services:
   app:
     image: brewing-service
-    container_name: brewing-service
     restart: unless-stopped
     ports:
       - 6636:6636
@@ -16,17 +15,16 @@ services:
       BARK_NOTIFY_TOKEN: vZgkHTPK3FLe5u4
       WHISPER_ENDPOINT: http://i.whisper.com
       OPENAI_PROXY: http://proxy
-      DOCKER_HOST: tcp://172.16.0.88:2375
+#      DOCKER_HOST: tcp://dockerHost:2375
       SHARE_DOMAIN: https://share.com
       MONGODB_CONN: mongodb://database:27017
     volumes:
-      - /data/brewing/templates:/app/templates
+      - /var/run/docker.sock:/var/run/docker.sock
     links:
       - database
 
   database:
     image: mongo
-    container_name: brewing-database
     restart: unless-stopped
     ports:
       - '27017:27017'
@@ -36,14 +34,30 @@ services:
 
   mongoku:
     image: huggingface/mongoku
-    container_name: brewing-mongoku
     environment:
-      MONGOKU_DEFAULT_HOST: "mongodb://database:27017"
+      MONGOKU_DEFAULT_HOST: mongodb://database:27017
     ports:
       - '3100:3100'
     links:
       - database
 
-volumes:
-  mongodb: {}
-  mongodbcfg: {}
+  whisperX:
+    image: whisperx-service # https://github.com/chinaboard/whisperX-service
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+    environment:
+      - ASR_MODEL=large
+    ports:
+      - 9900:9000
+    volumes:
+      - cache-whisper:/root/.cache/whisper
+
+  volumes:
+    mongodb: {}
+    mongodbcfg: {}
+    cache-whisper: {}
