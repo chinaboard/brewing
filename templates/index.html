@@ -112,7 +112,8 @@
                         "-videoUrl", url.trim()
                     ],
                     env: env,
-                    autoRemove: true
+                    autoRemove: true,
+                    language: lang.trim()
                 }),
             })
                 .then(response => {
