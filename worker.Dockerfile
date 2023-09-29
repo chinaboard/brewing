@@ -21,7 +21,7 @@ RUN set -x \
 
 WORKDIR /downloads
 
-COPY --from=builder /app/bin/brewing-runner /usr/bin/.
+COPY --from=builder /app/bin/brewing-worker /usr/bin/.
 
 ENTRYPOINT ["tini", "--"]
 
