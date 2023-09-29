@@ -10,6 +10,8 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/sirupsen/logrus"
+	"io"
+	"os"
 )
 
 type Dispatcher interface {
@@ -54,11 +56,14 @@ func (dd *TaskDispatcher) Run(taskAny any) error {
 		logrus.Debugln("Image start pull", imageName)
 		reader, err := dd.cli.ImagePull(ctx, imageName, types.ImagePullOptions{})
 		if err != nil {
+			logrus.Errorln(err)
 			return err
 		}
+		io.Copy(os.Stdout, reader)
 		defer reader.Close()
 		logrus.Debugln("Image pulled", imageName)
 	} else if err != nil {
+		logrus.Errorln(err)
 		return err
 	}
 
@@ -72,6 +77,7 @@ func (dd *TaskDispatcher) Run(taskAny any) error {
 		Env:   task.Env,
 	}, nil, nil, nil, task.UniqueId)
 	if err != nil {
+		logrus.Errorln(err)
 		return err
 	}
 
