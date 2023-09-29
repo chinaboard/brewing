@@ -13,7 +13,8 @@ import (
 )
 
 const (
-	filePath = "/tmp/temp.m4a"
+	filePath    = "/tmp/temp.mp3"
+	audioFormat = "mp3"
 )
 
 func main() {
@@ -43,7 +44,7 @@ func main() {
 
 	whisperEndpoint = strings.TrimSuffix(whisperEndpoint, "/")
 
-	if err := videodl.Download(videoUrl, filePath); err != nil {
+	if err := videodl.Download(videoUrl, filePath, audioFormat); err != nil {
 		log.Fatalln(err)
 	}
 

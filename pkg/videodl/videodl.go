@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-func Download(videoUrl, savePath string) error {
-	cmd := exec.Command("youtube-dl", "-f", "ba", "-x", "--audio-format", "m4a", videoUrl, "-o", savePath)
+func Download(videoUrl, savePath, audioFormat string) error {
+	cmd := exec.Command("youtube-dl", "-f", "ba", "-x", "--audio-format", audioFormat, videoUrl, "-o", savePath)
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
