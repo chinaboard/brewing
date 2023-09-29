@@ -20,6 +20,7 @@ services:
       MONGODB_CONN: mongodb://database:27017
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - tiktokenCache:/tmp/data-gym-cache
     links:
       - whisperX
       - database
@@ -62,3 +63,4 @@ services:
     mongodb: {}
     mongodbcfg: {}
     cache-whisper: {}
+    tiktokenCache: {}
