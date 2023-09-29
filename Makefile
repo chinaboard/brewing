@@ -1,6 +1,6 @@
 
-build-docker-runner:
-	docker build -t brewing-runner -f runner.Dockerfile .
+build-docker-worker:
+	docker build -t brewing-worker -f worker.Dockerfile .
 
 build-cli:
 	bash scripts/build-cli.sh

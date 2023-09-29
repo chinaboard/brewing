@@ -52,7 +52,7 @@ func main() {
 		ForcePull: false,
 		Env:       environ,
 		Command: []string{
-			"brewing-runner",
+			"brewing-worker",
 			"-whisperEndpoint",
 			fmt.Sprintf("%s://%s", cfg.WhisperEndpointSchema, cfg.WhisperEndpoint),
 			"-videoUrl",

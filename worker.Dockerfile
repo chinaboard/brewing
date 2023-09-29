@@ -7,7 +7,7 @@ COPY . .
 RUN export GOPROXY=https://goproxy.io \
     && export GO111MODULE=on \
     && go mod tidy \
-    && ./scripts/build-runner.sh
+    && ./scripts/build-worker.sh
 
 FROM alpine:latest
 
@@ -25,4 +25,4 @@ COPY --from=builder /app/bin/brewing-runner /usr/bin/.
 
 ENTRYPOINT ["tini", "--"]
 
-CMD ["brewing-runner","endpoint", "whisper:9000"]
+CMD ["brewing-worker", "endpoint", "whisper:9000"]

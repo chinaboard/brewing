@@ -104,9 +104,9 @@
                     name: name.trim(),
                     barkToken: token.trim(),
                     uniqueId: alias.trim(),
-                    imageName: "brewing-runner",
+                    imageName: "brewing-worker",
                     command: [
-                        "brewing-runner",
+                        "brewing-worker",
                         "-language", lang,
                         "-whisperEndpoint", "{{ .WhisperEndpointSchema}}://{{ .WhisperEndpoint }}",
                         "-videoUrl", url.trim()
