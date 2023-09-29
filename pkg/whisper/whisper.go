@@ -11,7 +11,7 @@ func Asr(whisperEndpoint, filePath, language string) (*AsrResp, error) {
 	resp, err := client.R().
 		SetHeader("Accept", "application/json").
 		SetFiles(map[string]string{"audio_file": filePath}).
-		SetQueryString(fmt.Sprintf("task=transcribe&language=%s&encode=false&output=json", language)).
+		SetQueryString(fmt.Sprintf("task=transcribe&language=%s&encode=true&output=json", language)).
 		Post(whisperEndpoint + "/asr")
 
 	if err != nil {

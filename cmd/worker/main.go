@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	filePath = "/tmp/temp.wav"
+	filePath = "/tmp/temp.m4a"
 )
 
 func main() {

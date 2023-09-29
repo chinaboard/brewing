@@ -8,7 +8,7 @@ import (
 )
 
 func Download(videoUrl, savePath string) error {
-	cmd := exec.Command("youtube-dl", "-f", "ba", "-x", "--audio-format", "wav", videoUrl, "-o", savePath)
+	cmd := exec.Command("youtube-dl", "-f", "ba", "-x", "--audio-format", "m4a", videoUrl, "-o", savePath)
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
