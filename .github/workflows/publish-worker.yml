@@ -28,5 +28,5 @@ jobs:
 
       - name: Build and push worker image
         run: |
-          docker build -t brewing-worker:latest -f worker.Dockerfile .
-          docker push brewing-worker:latest
+          docker build -t ${{ env.IMAGE_NAME }} -f worker.Dockerfile .
+          docker push ${{ env.IMAGE_NAME }}

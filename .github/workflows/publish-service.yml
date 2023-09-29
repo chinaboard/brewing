@@ -28,5 +28,5 @@ jobs:
 
       - name: Build and push service image
         run: |
-          docker build -t brewing-service:latest -f service.Dockerfile .
-          docker push brewing-service:latest
+          docker build -t ${{ env.IMAGE_NAME }} -f service.Dockerfile .
+          docker push ${{ env.IMAGE_NAME }}
