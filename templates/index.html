@@ -104,16 +104,15 @@
                     name: name.trim(),
                     barkToken: token.trim(),
                     uniqueId: alias.trim(),
-                    imageName: "brewing-worker",
+                    imageName: "chinaboard/brewing-worker",
                     command: [
                         "brewing-worker",
-                        "-language", lang,
+                        "-language", lang.trim(),
                         "-whisperEndpoint", "{{ .WhisperEndpointSchema}}://{{ .WhisperEndpoint }}",
                         "-videoUrl", url.trim()
                     ],
                     env: env,
-                    autoRemove: true,
-                    language: lang.trim()
+                    autoRemove: true
                 }),
             })
                 .then(response => {

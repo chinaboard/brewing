@@ -27,7 +27,7 @@ func (ch *Chain) chain(c *gin.Context) {
 		return
 	}
 
-	if strings.TrimSpace(task.ImageName) == "" || !strings.Contains(task.ImageName, "brewing") {
+	if strings.TrimSpace(task.ImageName) == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": errors.New("invalid image name").Error(),
 		})

@@ -25,7 +25,6 @@ type Task struct {
 
 	ContainerId string `json:"containerId" bson:"containerId"`
 
-	Language  string `json:"language" bson:"language" binding:"required"`
 	BarkToken string `json:"barkToken" bson:"barkToken"`
 }
 
