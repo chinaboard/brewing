@@ -2,7 +2,7 @@ version: '3'
 
 services:
   app:
-    image: brewing-service
+    image: chinaboard/brewing-service
     restart: unless-stopped
     ports:
       - 6636:6636
@@ -13,14 +13,15 @@ services:
       OPENAI_BASE_URL: https://ai.openai.net/v1
       BARK_NOTIFY_DOMAIN: https://notify.bark.com
       BARK_NOTIFY_TOKEN: vZgkHTPK3FLe5u4
-      WHISPER_ENDPOINT: http://i.whisper.com
-      OPENAI_PROXY: http://proxy
+      WHISPER_ENDPOINT: whisperX:9000
+#      OPENAI_PROXY: http://proxy
 #      DOCKER_HOST: tcp://dockerHost:2375
       SHARE_DOMAIN: https://share.com
       MONGODB_CONN: mongodb://database:27017
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     links:
+      - whisperX
       - database
 
   database:
@@ -42,7 +43,7 @@ services:
       - database
 
   whisperX:
-    image: whisperx-service # https://github.com/chinaboard/whisperX-service
+    image: chinaboard/whisperx-service # https://github.com/chinaboard/whisperX-service
     deploy:
       resources:
         reservations:
@@ -53,7 +54,7 @@ services:
     environment:
       - ASR_MODEL=large
     ports:
-      - 9900:9000
+      - 9000:9000
     volumes:
       - cache-whisper:/root/.cache
 
