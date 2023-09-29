@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func (ch *Chain) chain(c *gin.Context) {
@@ -35,13 +36,14 @@ func (ch *Chain) chain(c *gin.Context) {
 	}
 
 	go func() {
+		dt := time.Now()
 		err := runner(ch.repo, &task)
 
 		if err != nil {
-			notify.Send(task.Name, err.Error(), "brewing", task.BarkToken, "")
+			notify.Send(task.Name, fmt.Sprint(time.Since(dt), err.Error()), "brewing", task.BarkToken, "")
 		} else {
 			msg := fmt.Sprintf("%s/share/%s", strings.TrimSuffix(cfg.ShareDomain, "/"), task.UniqueId)
-			notify.Send(task.Name, "success", "brewing", task.BarkToken, msg)
+			notify.Send(task.Name, fmt.Sprint(time.Since(dt), "success"), "brewing", task.BarkToken, msg)
 		}
 	}()
 

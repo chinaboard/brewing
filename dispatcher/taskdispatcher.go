@@ -53,12 +53,14 @@ func (dd *TaskDispatcher) Run(taskAny any) error {
 		if err = dd.tc.Update(task.UniqueId, task); err != nil {
 			return err
 		}
+
 		logrus.Debugln("Image start pull", imageName)
 		reader, err := dd.cli.ImagePull(ctx, imageName, types.ImagePullOptions{})
 		if err != nil {
 			logrus.Errorln(err)
 			return err
 		}
+
 		io.Copy(os.Stdout, reader)
 		defer reader.Close()
 		logrus.Debugln("Image pulled", imageName)
@@ -68,6 +70,7 @@ func (dd *TaskDispatcher) Run(taskAny any) error {
 	}
 
 	task.Status = "ContainerCreate"
+	logrus.Debugln(task.UniqueId, "ContainerWait")
 	if err = dd.tc.Update(task.UniqueId, task); err != nil {
 		return err
 	}
@@ -85,16 +88,19 @@ func (dd *TaskDispatcher) Run(taskAny any) error {
 	if err = dd.tc.Update(task.UniqueId, task); err != nil {
 		return err
 	}
+
 	task.Status = "ContainerStart"
-	if err := dd.cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+	logrus.Debugln(task.UniqueId, resp.ID, "ContainerStart")
+	if err = dd.cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		return err
 	}
 
 	task.Status = "ContainerWait"
-
+	logrus.Debugln(task.UniqueId, resp.ID, "ContainerWait")
 	if err = dd.tc.Update(task.UniqueId, task); err != nil {
 		return err
 	}
+
 	statusCh, errCh := dd.cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
 	select {
 	case err = <-errCh:
@@ -108,8 +114,13 @@ func (dd *TaskDispatcher) Run(taskAny any) error {
 	if err != nil {
 		return err
 	}
+
 	var stdout, stderr bytes.Buffer
-	_, _ = stdcopy.StdCopy(&stdout, &stderr, out)
+	_, err = stdcopy.StdCopy(&stdout, &stderr, out)
+	if err != nil {
+		logrus.Errorln(err)
+		return err
+	}
 
 	task.Stdout = stdout.String()
 	task.Stderr = stderr.String()
@@ -122,6 +133,7 @@ func (dd *TaskDispatcher) Run(taskAny any) error {
 	task.Status = inspection.State.Status
 	task.ExitCode = inspection.State.ExitCode
 
+	logrus.Debugln(task.UniqueId, resp.ID, "ContainerInspect")
 	if err = dd.tc.Update(task.UniqueId, task); err != nil {
 		return err
 	}
@@ -135,7 +147,7 @@ func (dd *TaskDispatcher) Run(taskAny any) error {
 			}); err != nil {
 				logrus.Fatalln(err)
 			}
-			logrus.Debugln(resp.ID, "Container removed")
+			logrus.Debugln(task.UniqueId, resp.ID, "Container removed")
 		}()
 	}
 	return nil
