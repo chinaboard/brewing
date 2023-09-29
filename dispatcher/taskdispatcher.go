@@ -70,7 +70,7 @@ func (dd *TaskDispatcher) Run(taskAny any) error {
 	}
 
 	task.Status = "ContainerCreate"
-	logrus.Debugln(task.UniqueId, "ContainerWait")
+	logrus.Debugln(task.UniqueId, "ContainerCreate")
 	if err = dd.tc.Update(task.UniqueId, task); err != nil {
 		return err
 	}

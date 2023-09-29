@@ -20,16 +20,21 @@ import (
 
 const (
 	MAX_TOKEN = 1000
+	MODEL     = openai.GPT3Dot5Turbo
 )
 
 type GPTService struct {
+	tkm   *tiktoken.Tiktoken
+	model string
 }
 
 func init() {
 	retry.Attempts(3)
+	tkm, _ := tiktoken.EncodingForModel(MODEL)
+	Service = &GPTService{model: MODEL, tkm: tkm}
 }
 
-var Service = &GPTService{}
+var Service *GPTService
 
 func newClient() *openai.Client {
 	config := openai.DefaultConfig(cfg.OpenAiToken)
@@ -54,7 +59,7 @@ func newClient() *openai.Client {
 
 func (g *GPTService) Text(i int, content string) (string, error) {
 	msg := renderRequest(content)
-	logrus.Debugln("token", i, "request:", numTokensFromMessages(&msg, openai.GPT3Dot5Turbo))
+	logrus.Debugln("token", i, "request:", g.numTokensFromMessages(&msg))
 	resp, err := newClient().CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
@@ -70,7 +75,7 @@ func (g *GPTService) Text(i int, content string) (string, error) {
 
 func (g *GPTService) TextStream(content string) {
 	msg := renderRequest(content)
-	logrus.Debugln("token request:", numTokensFromMessages(&msg, openai.GPT3Dot5Turbo))
+	logrus.Debugln("token request:", g.numTokensFromMessages(&msg))
 	stream, err := newClient().CreateChatCompletionStream(
 		context.Background(),
 		openai.ChatCompletionRequest{
@@ -101,7 +106,7 @@ func (g *GPTService) TextStream(content string) {
 }
 
 func (g *GPTService) Summary(content []string) (string, error) {
-	parts := g.SplitContent(content, MAX_TOKEN)
+	parts := g.SplitContent(content)
 	var resultParts []string
 	logrus.Debugln("req content", len(parts), "parts")
 	for i, c := range parts {
@@ -165,38 +170,26 @@ func (g *GPTService) SummaryParallel(parts []string) ([]string, []error) {
 }
 
 func (g *GPTService) SummaryStream(content []string) {
-	parts := g.SplitContent(content, 5000)
+	parts := g.SplitContent(content)
 	for _, part := range parts {
 		g.TextStream(part)
 	}
 }
 
-func (g *GPTService) SplitContent(content []string, maxLen int) []string {
+func (g *GPTService) SplitContent(content []string) []string {
 	logrus.Debugln("raw content", len(content), "parts")
 	dt := time.Now()
-	m := sync.Map{}
-	var wg sync.WaitGroup
-	for i, c := range content {
-		wg.Add(1)
-		i, c := i, c
-		go func() {
-			defer wg.Done()
-			msg := []openai.ChatCompletionMessage{
-				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: c,
-				}}
-			m.Store(i, numTokensFromMessages(&msg, openai.GPT3Dot5Turbo))
-		}()
-	}
-	wg.Wait()
 	var parts []string
 	var str string
 	var strToken int
-	for i, c := range content {
-		tk, _ := m.Load(i)
-		token := tk.(int)
-		if strToken+token < maxLen {
+	for _, c := range content {
+		msg := []openai.ChatCompletionMessage{
+			{
+				Role:    openai.ChatMessageRoleUser,
+				Content: c,
+			}}
+		token := g.numTokensFromMessages(&msg)
+		if strToken+token < MAX_TOKEN {
 			strToken += token
 			str += c
 		} else {
@@ -210,13 +203,8 @@ func (g *GPTService) SplitContent(content []string, maxLen int) []string {
 	return parts
 }
 
-func numTokensFromMessages(messages *[]openai.ChatCompletionMessage, model string) (num_tokens int) {
-	tkm, err := tiktoken.EncodingForModel(model)
-	if err != nil {
-		err = fmt.Errorf("EncodingForModel: %v", err)
-		fmt.Println(err)
-		return
-	}
+func (g *GPTService) numTokensFromMessages(messages *[]openai.ChatCompletionMessage) (numTokens int) {
+	model, tkm := g.model, g.tkm
 
 	var tokens_per_message int
 	var tokens_per_name int
@@ -233,16 +221,17 @@ func numTokensFromMessages(messages *[]openai.ChatCompletionMessage, model strin
 	}
 
 	for _, message := range *messages {
-		num_tokens += tokens_per_message
-		num_tokens += len(tkm.Encode(message.Content, nil, nil))
-		num_tokens += len(tkm.Encode(message.Role, nil, nil))
-		num_tokens += len(tkm.Encode(message.Name, nil, nil))
+		numTokens += tokens_per_message
+		numTokens += len(tkm.Encode(message.Content, nil, nil))
+		numTokens += len(tkm.Encode(message.Role, nil, nil))
+		numTokens += len(tkm.Encode(message.Name, nil, nil))
 		if message.Name != "" {
-			num_tokens += tokens_per_name
+			numTokens += tokens_per_name
 		}
 	}
-	num_tokens += 3
-	return num_tokens
+
+	numTokens += 3
+	return numTokens
 }
 
 func renderRequest(content string) []openai.ChatCompletionMessage {

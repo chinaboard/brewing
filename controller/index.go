@@ -1,4 +1,4 @@
-package contorller
+package controller
 
 import (
 	"github.com/chinaboard/brewing/pkg/cfg"

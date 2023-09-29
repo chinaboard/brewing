@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/chinaboard/brewing/contorller"
+	"github.com/chinaboard/brewing/controller"
 	"github.com/chinaboard/brewing/pkg/bininfo"
 	"github.com/chinaboard/brewing/pkg/cfg"
 	"github.com/sirupsen/logrus"
@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	routersInit := contorller.InitRouter(logrus.StandardLogger())
+	routersInit := controller.InitRouter(logrus.StandardLogger())
 
 	server := &http.Server{
 		Addr:    ":" + cfg.HttpPort,

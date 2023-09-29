@@ -32,7 +32,7 @@ func (od *OpenaiDispatcher) Add(taskAny any) error {
 func (od *OpenaiDispatcher) Run(taskAny any) error {
 	task := taskAny.(*model.AsrReponse)
 	var errors []string
-	parts := ai.Service.SplitContent(task.MakeContent(), ai.MAX_TOKEN)
+	parts := ai.Service.SplitContent(task.MakeContent())
 	c, e := ai.Service.SummaryParallel(parts)
 	for _, err := range e {
 		if err != nil {
