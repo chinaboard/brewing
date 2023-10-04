@@ -40,7 +40,7 @@ func NewTaskDispatcher() (Dispatcher, error) {
 
 func (dd *TaskDispatcher) Add(taskAny any) error {
 	task := taskAny.(*model.Task)
-	return dd.tc.Add(task.UniqueId, task)
+	return dd.tc.Add(task)
 }
 
 func (dd *TaskDispatcher) Run(taskAny any) error {
@@ -50,7 +50,7 @@ func (dd *TaskDispatcher) Run(taskAny any) error {
 	_, _, err := dd.cli.ImageInspectWithRaw(ctx, imageName)
 	if task.ForcePull || client.IsErrNotFound(err) {
 		task.Status = "ImagePull"
-		if err = dd.tc.Update(task.UniqueId, task); err != nil {
+		if err = dd.tc.Update(task); err != nil {
 			return err
 		}
 
@@ -71,7 +71,7 @@ func (dd *TaskDispatcher) Run(taskAny any) error {
 
 	task.Status = "ContainerCreate"
 	logrus.Debugln(task.UniqueId, "ContainerCreate")
-	if err = dd.tc.Update(task.UniqueId, task); err != nil {
+	if err = dd.tc.Update(task); err != nil {
 		return err
 	}
 	resp, err := dd.cli.ContainerCreate(ctx, &container.Config{
@@ -85,7 +85,7 @@ func (dd *TaskDispatcher) Run(taskAny any) error {
 	}
 
 	task.ContainerId = resp.ID
-	if err = dd.tc.Update(task.UniqueId, task); err != nil {
+	if err = dd.tc.Update(task); err != nil {
 		return err
 	}
 
@@ -97,7 +97,7 @@ func (dd *TaskDispatcher) Run(taskAny any) error {
 
 	task.Status = "ContainerWait"
 	logrus.Debugln(task.UniqueId, resp.ID, "ContainerWait")
-	if err = dd.tc.Update(task.UniqueId, task); err != nil {
+	if err = dd.tc.Update(task); err != nil {
 		return err
 	}
 
@@ -134,7 +134,7 @@ func (dd *TaskDispatcher) Run(taskAny any) error {
 	task.ExitCode = inspection.State.ExitCode
 
 	logrus.Debugln(task.UniqueId, resp.ID, "ContainerInspect")
-	if err = dd.tc.Update(task.UniqueId, task); err != nil {
+	if err = dd.tc.Update(task); err != nil {
 		return err
 	}
 

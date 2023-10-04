@@ -40,7 +40,7 @@ func (j *asrRepo) Add(c *gin.Context) {
 		})
 		return
 	}
-	asr, err := model.ConvertToAsrReponse(t.(*model.Task).Stdout)
+	asr, err := model.ConvertToAsrResponse(t.(*model.Task).Stdout)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"msg": err.Error(),
@@ -76,7 +76,7 @@ func (j *asrRepo) Run(c *gin.Context) {
 		if e != nil {
 			msg = e.Error()
 		}
-		asr := r.(*model.AsrReponse)
+		asr := r.(*model.AsrResponse)
 		notify.Send(taskId, msg, "brewing", asr.BarkToken, "")
 	}()
 
@@ -116,7 +116,7 @@ func (j *asrRepo) Summary(c *gin.Context) {
 			url = s
 		}
 	}
-	asr := r.(*model.AsrReponse)
+	asr := r.(*model.AsrResponse)
 	content := asr.Pretty
 
 	if c.Query("raw") != "" {

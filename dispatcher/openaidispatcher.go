@@ -25,12 +25,12 @@ func NewOpenaiDispatcher() (Dispatcher, error) {
 }
 
 func (od *OpenaiDispatcher) Add(taskAny any) error {
-	task := taskAny.(*model.AsrReponse)
-	return od.ac.Add(task.UniqueId, task)
+	task := taskAny.(*model.AsrResponse)
+	return od.ac.Add(task)
 }
 
 func (od *OpenaiDispatcher) Run(taskAny any) error {
-	task := taskAny.(*model.AsrReponse)
+	task := taskAny.(*model.AsrResponse)
 	var errors []string
 	parts := ai.Service.SplitContent(task.MakeContent())
 	c, e := ai.Service.SummaryParallel(parts)
@@ -49,7 +49,7 @@ func (od *OpenaiDispatcher) Run(taskAny any) error {
 		results = append(results, strings.Split(cc, "\n")...)
 	}
 	task.Pretty = results
-	return od.ac.Update(task.UniqueId, task)
+	return od.ac.Update(task)
 }
 
 func (od OpenaiDispatcher) Del(id string) error {

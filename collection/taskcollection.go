@@ -5,11 +5,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"time"
 )
 
 type Collection interface {
-	Add(string, any) error
-	Update(string, any) error
+	Add(any) error
+	Update(any) error
 	Get(string) (any, error)
 	List() (any, error)
 	Del(string) error
@@ -27,25 +28,27 @@ func NewTaskCollection(databaseName string) (*TaskCollection, error) {
 	return &TaskCollection{mc: r.Database(databaseName).Collection("task")}, nil
 }
 
-func (tc *TaskCollection) Add(uniqueId string, task any) error {
+func (tc *TaskCollection) Add(task any) error {
 	opt := options.Update().SetUpsert(true)
 
+	tv := task.(*model.Task)
+	tv.UpdateAt = time.Now()
+
 	filter := bson.M{
-		"uniqueId": uniqueId,
+		"uniqueId": tv.UniqueId,
 	}
 
 	update := bson.M{
-		"$set": task,
+		"$set": tv,
 	}
 
-	_, err := tc.mc.
-		UpdateOne(nil, filter, update, opt)
+	_, err := tc.mc.UpdateOne(nil, filter, update, opt)
 
 	return err
 }
 
-func (tc *TaskCollection) Update(uniqueId string, job any) error {
-	return tc.Add(uniqueId, job)
+func (tc *TaskCollection) Update(job any) error {
+	return tc.Add(job)
 }
 
 func (tc *TaskCollection) Get(uniqueId string) (any, error) {

@@ -5,6 +5,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"time"
 )
 
 type AsrCollection struct {
@@ -21,32 +22,34 @@ func NewAsrCollection(databaseName string) (*AsrCollection, error) {
 	}, nil
 }
 
-func (ac *AsrCollection) Add(uniqueId string, asrModel any) error {
+func (ac *AsrCollection) Add(asrModel any) error {
 	opt := options.Update().SetUpsert(true)
 
+	av := asrModel.(*model.AsrResponse)
+	av.UpdateAt = time.Now()
+
 	filter := bson.M{
-		"uniqueId": uniqueId,
+		"uniqueId": av.UniqueId,
 	}
 
 	update := bson.M{
-		"$set": asrModel,
+		"$set": av,
 	}
 
-	_, err := ac.mc.
-		UpdateOne(nil, filter, update, opt)
+	_, err := ac.mc.UpdateOne(nil, filter, update, opt)
 
 	return err
 }
 
-func (ac *AsrCollection) Update(uniqueId string, asrModel any) error {
-	return ac.Add(uniqueId, asrModel)
+func (ac *AsrCollection) Update(asrModel any) error {
+	return ac.Add(asrModel)
 }
 
 func (ac *AsrCollection) Get(uniqueId string) (any, error) {
 	filter := bson.M{
 		"uniqueId": uniqueId,
 	}
-	var v model.AsrReponse
+	var v model.AsrResponse
 	err := ac.mc.FindOne(nil, filter).Decode(&v)
 	return &v, err
 }
@@ -56,7 +59,7 @@ func (ac *AsrCollection) List() (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	var result []model.AsrReponse
+	var result []model.AsrResponse
 	err = cursor.All(nil, &result)
 	if err != nil {
 		return nil, err

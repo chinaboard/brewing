@@ -3,6 +3,7 @@ package model
 import (
 	"crypto/sha1"
 	"fmt"
+	"time"
 )
 
 type Task struct {
@@ -26,6 +27,9 @@ type Task struct {
 	ContainerId string `json:"containerId" bson:"containerId"`
 
 	BarkToken string `json:"barkToken" bson:"barkToken"`
+
+	CreateAt time.Time `json:"createAt" bson:"createAt"`
+	UpdateAt time.Time `bson:"updateAt" bson:"updateAt"`
 }
 
 func (b *Task) Hash() string {
@@ -34,4 +38,12 @@ func (b *Task) Hash() string {
 	h.Write([]byte(str))
 	bs := h.Sum(nil)
 	return fmt.Sprintf("%x", bs)
+}
+
+func NewTask(env, command []string) *Task {
+	return &Task{
+		Env:      env,
+		Command:  command,
+		CreateAt: time.Now(),
+	}
 }

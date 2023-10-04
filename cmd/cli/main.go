@@ -48,17 +48,13 @@ func main() {
 		json.Unmarshal([]byte(env), &environ)
 		logrus.Debugln("env", environ)
 	}
-	brewingTask := &model.Task{
-		ForcePull: false,
-		Env:       environ,
-		Command: []string{
-			"brewing-worker",
-			"-whisperEndpoint",
-			fmt.Sprintf("%s://%s", cfg.WhisperEndpointSchema, cfg.WhisperEndpoint),
-			"-videoUrl",
-			videoUrl,
-		},
-	}
+	brewingTask := model.NewTask(environ, []string{
+		"brewing-worker",
+		"-whisperEndpoint",
+		fmt.Sprintf("%s://%s", cfg.WhisperEndpointSchema, cfg.WhisperEndpoint),
+		"-videoUrl",
+		videoUrl,
+	})
 
 	d, err := dispatcher.NewTaskDispatcher()
 	if err != nil {

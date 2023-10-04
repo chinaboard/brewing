@@ -90,7 +90,7 @@ func runner(repo *asrRepo, task *model.Task) error {
 
 jump:
 	task = v.(*model.Task)
-	asr, err := model.ConvertToAsrReponse(task.Stdout)
+	asr, err := model.ConvertToAsrResponse(task.Stdout)
 	if err != nil {
 		return err
 	}
