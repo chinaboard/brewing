@@ -48,7 +48,7 @@
          style="width: 100%; {{if not .Raw}}text-indent:2em;{{end}} margin-top: 30px;">
         {{range .Content}}
             {{if .}}
-                <p style="padding-top: 23px;" class="monospace">{{. | safeHTML}}</p>
+                <p style="padding-top: 23px; " class="monospace">{{. | safeHTML}}</p>
             {{end}}
         {{end}}
     </div>
