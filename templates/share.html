@@ -47,7 +47,11 @@
     <div class="page__bd page__bd_spacing"
          style="width: 100%; {{if not .Raw}}text-indent:2em;{{end}} margin-top: 30px;">
         {{range .Content}}
-        <p class="monospace">{{. | safeHTML}}</p>
+            {{if .}}
+                <p style="padding-top: 23px;" class="monospace">{{. | safeHTML}}</p>
+            {{else}}
+                <br/>
+            {{end}}
         {{end}}
     </div>
 </div>
