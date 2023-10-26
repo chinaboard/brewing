@@ -41,6 +41,7 @@ func (ch *Chain) chain(c *gin.Context) {
 			fmt.Sprintf("WHISPER_ENDPOINT=%s", cfg.WhisperEndpoint),
 			fmt.Sprintf("WHISPER_ENDPOINT_SCHEMA=%s", cfg.WhisperEndpointSchema),
 		}...)
+
 		err := runner(ch.repo, &task)
 
 		if err != nil {

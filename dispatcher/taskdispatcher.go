@@ -40,6 +40,7 @@ func NewTaskDispatcher() (Dispatcher, error) {
 
 func (dd *TaskDispatcher) Add(taskAny any) error {
 	task := taskAny.(*model.Task)
+	task.ExitCode = -1
 	return dd.tc.Add(task)
 }
 
