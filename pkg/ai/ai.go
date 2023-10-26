@@ -126,6 +126,7 @@ func (g *GPTService) SummaryParallel(parts []string) ([]string, []error) {
 	m := sync.Map{}
 	var wg sync.WaitGroup
 	var e []error
+	st := time.Now()
 	ch := make(chan struct{}, runtime.NumCPU())
 	logrus.Debugln("req content", len(parts), "parts")
 	for i, c := range parts {
@@ -162,6 +163,7 @@ func (g *GPTService) SummaryParallel(parts []string) ([]string, []error) {
 	}
 	wg.Wait()
 
+	logrus.Debugln("content", "process", "done", time.Since(st))
 	for i, _ := range parts {
 		v, _ := m.Load(i)
 		resultParts = append(resultParts, v.(string))
