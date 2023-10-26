@@ -12,7 +12,16 @@ RUN export GOPROXY=https://goproxy.io \
 FROM alpine:latest
 
 RUN set -x \
- && apk add --no-cache ca-certificates curl bash tini ffmpeg python3 \
+ && apk update \
+ && apk upgrade -a \
+ && apk add --no-cache \
+        ca-certificates \
+        curl \
+        bash \
+        tini \
+        ffmpeg \
+        python3 \
+        py3-mutagen \
  && curl -L https://github.com/yt-dlp/yt-dlp/releases/download/2023.10.13/yt-dlp -o /usr/local/bin/youtube-dl \
  && chmod a+rx /usr/local/bin/youtube-dl \
  && mkdir /downloads \
