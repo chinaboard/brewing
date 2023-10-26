@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/chinaboard/brewing/pkg/bininfo"
+	"github.com/chinaboard/brewing/pkg/cfg"
 	"github.com/chinaboard/brewing/pkg/videodl"
 	"github.com/chinaboard/brewing/pkg/whisper"
 	"log"
@@ -34,9 +35,9 @@ func main() {
 	}
 
 	if whisperEndpoint == "" {
-		fmt.Println("Error: whisperEndpoint must be set")
-		os.Exit(1)
+		whisperEndpoint = fmt.Sprintf("%s://%s", cfg.WhisperEndpointSchema, cfg.WhisperEndpoint)
 	}
+
 	if videoUrl == "" {
 		fmt.Println("Error: videoUrl must be set")
 		os.Exit(1)

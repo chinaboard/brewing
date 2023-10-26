@@ -37,6 +37,10 @@ func (ch *Chain) chain(c *gin.Context) {
 
 	go func() {
 		dt := time.Now()
+		task.Env = append(task.Env, []string{
+			fmt.Sprintf("WHISPER_ENDPOINT=%s", cfg.WhisperEndpoint),
+			fmt.Sprintf("WHISPER_ENDPOINT_SCHEMA=%s", cfg.WhisperEndpointSchema),
+		}...)
 		err := runner(ch.repo, &task)
 
 		if err != nil {

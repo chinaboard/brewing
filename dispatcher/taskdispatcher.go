@@ -138,8 +138,8 @@ func (dd *TaskDispatcher) Run(taskAny any) error {
 		return err
 	}
 
-	logrus.Debugln("Container ", inspection.State.Status, "code", inspection.State.ExitCode)
-	if task.AutoRemove {
+	logrus.Debugln("Container", inspection.State.Status, "code", inspection.State.ExitCode)
+	if task.AutoRemove && inspection.State.ExitCode == 0 {
 		defer func() {
 			if err = dd.cli.ContainerRemove(ctx, resp.ID, types.ContainerRemoveOptions{
 				RemoveVolumes: true,
